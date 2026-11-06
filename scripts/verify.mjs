@@ -12,7 +12,7 @@
  * depending on the Desktop shell's auth layer.
  */
 import { spawnSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -55,7 +55,10 @@ for (const relative of ['lib/comfy.js', 'lib/studio-upstream.js', 'lib/workflow.
 }
 
 console.log('\n== offline tests ==');
-const tests = spawnSync(process.execPath, ['--test', path.join('test', '*.test.mjs')], { cwd: root, stdio: 'inherit' });
+const testFiles = readdirSync(path.join(root, 'test'))
+  .filter((name) => name.endsWith('.test.mjs'))
+  .map((name) => path.join('test', name));
+const tests = spawnSync(process.execPath, ['--test', ...testFiles], { cwd: root, stdio: 'inherit' });
 report('node --test test/*.test.mjs', tests.status === 0);
 
 if (has('--live')) {
