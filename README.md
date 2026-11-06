@@ -1,5 +1,7 @@
 # dsh-comfyui-studio
 
+[![npm](https://img.shields.io/npm/v/dsh-comfyui-studio.svg)](https://www.npmjs.com/package/dsh-comfyui-studio) [![CI](https://github.com/xingyeai23/dsh-comfyui-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/xingyeai23/dsh-comfyui-studio/actions/workflows/ci.yml)
+
 带**左侧栏入口**的 DeepSeek Harness 插件：把 ComfyUI 变成工作台式面板。
 
 - **顶部**：服务状态 + 四张**等宽**实时卡片（显存/内存/队列/活动）；右上角是「中断生成 / 刷新 / 返回会话」
@@ -105,9 +107,9 @@ ComfyUI 标准 API 只暴露显存、不暴露 GPU 计算占用率，所以这�
 由 agent 调用 `plugin_manager` 的 `install_bundle`，`target` 指向本仓库目录。刷新页面后出现入口；Host 代码改动需要重新安装 bundle（或重启 DSH），客户端代码刷新页面即可。
 卸载：`plugin_manager` → `remove_bundle`，target 为 `dsh-comfyui-studio`。
 
-**方式 C：npm（发布后）**
+**方式 C：npm**
 
-包名 `dsh-comfyui-studio`；发布后插件索引会带上 npm 版本与来源，`install_bundle` 的 `target` 可用 `dsh-comfyui-studio@<version>`。
+包名 `dsh-comfyui-studio`，已发布到 npm：`https://www.npmjs.com/package/dsh-comfyui-studio`。插件索引使用 npm 来源，`install_bundle` 的 `target` 为 `dsh-comfyui-studio@<version>`；也可以直接 `npm i dsh-comfyui-studio` 查看包内容。
 
 ## 配置
 

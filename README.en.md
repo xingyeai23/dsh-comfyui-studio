@@ -1,5 +1,7 @@
 # dsh-comfyui-studio
 
+[![npm](https://img.shields.io/npm/v/dsh-comfyui-studio.svg)](https://www.npmjs.com/package/dsh-comfyui-studio)
+
 ComfyUI studio plugin for [DeepSeek Harness](https://github.com/xingyeai23/dsh-comfyui-studio): manage saved ComfyUI workflows, prompts, LoRAs and generated images from a DSH sidebar panel.
 
 ## Features
