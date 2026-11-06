@@ -72,7 +72,7 @@
           "source": {
             "type": "git",
             "url": "https://github.com/xingyeai23/dsh-comfyui-studio",
-            "commit": "0000000000000000000000000000000000000000",
+            "commit": "06a39f5ac15ffdcadf0337fe1e9d230dab29fb1b",
             "path": "."
           },
           "engines": {
