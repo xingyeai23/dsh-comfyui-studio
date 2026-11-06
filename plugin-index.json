@@ -1,0 +1,85 @@
+{
+  "format": 1,
+  "title": {
+    "zh": "ComfyUI Studio",
+    "en": "ComfyUI Studio"
+  },
+  "description": {
+    "zh": "DSH 的 ComfyUI 工作室插件索引。",
+    "en": "Plugin index for the DSH ComfyUI Studio."
+  },
+  "metadata": {
+    "categories": {
+      "image": {
+        "title": {
+          "zh": "图像生成",
+          "en": "Image generation"
+        }
+      }
+    },
+    "labels": {
+      "comfyui": {
+        "title": {
+          "zh": "ComfyUI",
+          "en": "ComfyUI"
+        }
+      },
+      "image": {
+        "title": {
+          "zh": "图像",
+          "en": "Image"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-comfyui-studio",
+      "title": {
+        "zh": "ComfyUI 工作室",
+        "en": "ComfyUI Studio"
+      },
+      "description": {
+        "zh": "在 DSH 左侧栏管理工作流、提示词、LoRA 与生成结果，内置节点编辑器和原生 ComfyUI 画布。",
+        "en": "Manage ComfyUI workflows, prompts, LoRAs and results in a DSH sidebar panel, with a built-in node editor and an embedded native ComfyUI canvas."
+      },
+      "author": "xingyeai23",
+      "homepage": "https://github.com/xingyeai23/dsh-comfyui-studio#readme",
+      "repository": {
+        "url": "https://github.com/xingyeai23/dsh-comfyui-studio"
+      },
+      "icon": "./icon.svg",
+      "metadata": {
+        "category": "image",
+        "labels": [
+          "comfyui",
+          "image"
+        ],
+        "keywords": [
+          "comfyui",
+          "dsh",
+          "deepseek-harness",
+          "lora",
+          "workflow",
+          "image",
+          "seed"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.3.0",
+          "publishTimestamp": 1793984070,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/xingyeai23/dsh-comfyui-studio",
+            "commit": "0000000000000000000000000000000000000000",
+            "path": "."
+          },
+          "engines": {
+            "dsh": ">=0.2.2-rc.1"
+          }
+        }
+      ]
+    }
+  ]
+}

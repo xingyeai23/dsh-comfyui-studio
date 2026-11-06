@@ -1,0 +1,68 @@
+{
+  "name": "dsh-comfyui-studio",
+  "version": "0.3.0",
+  "description": "ComfyUI studio for DeepSeek Harness: saved workflows, prompts, LoRA quick edit, node editor and image lightbox.",
+  "type": "module",
+  "main": "lib/host.js",
+  "exports": {
+    ".": {
+      "import": "./lib/host.js",
+      "default": "./lib/host.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "locale",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "plugin-index.json"
+  ],
+  "engines": {
+    "node": ">=20.3.0",
+    "dsh": ">=0.2.2-rc.1"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "comfyui",
+    "lora",
+    "image-generation",
+    "workflow",
+    "plugin"
+  ],
+  "author": "xingyeai23",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xingyeai23/dsh-comfyui-studio.git"
+  },
+  "homepage": "https://github.com/xingyeai23/dsh-comfyui-studio#readme",
+  "bugs": {
+    "url": "https://github.com/xingyeai23/dsh-comfyui-studio/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "verify": "node scripts/verify.mjs"
+  }
+}

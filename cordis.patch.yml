@@ -1,0 +1,27 @@
+# dsh-comfyui-studio bundle patch
+#
+# 安装：plugin_manager install_bundle（target 指向本目录）。
+# 左侧栏「ComfyUI」入口 → 工作流 + 提示词工作台，右侧图片预览，顶部实时硬件/活动。
+#
+# 下列 config 是默认值；要覆盖时在 profile 的 cordis.patch.yml 里按 id 覆盖：
+#   - id: comfyui-panel
+#     config:
+#       baseUrl: http://127.0.0.1:8188
+- insert:
+    - id: comfyui-panel
+      name: dsh-comfyui-studio
+      config:
+        # ComfyUI 服务地址（默认本机；局域网/远程地址在 profile 里覆盖）
+        baseUrl: http://127.0.0.1:8188
+        # 「发现局域网」扫描端口
+        discoveryPort: 8188
+        # 单次上游请求超时（毫秒）
+        requestTimeoutMs: 8000
+        # 局域网扫描时每个候选地址的超时（毫秒）
+        discoverTimeoutMs: 1200
+        # 提示词 AI 转写使用的模型；留空 = 跟随当前会话默认模型
+        llmProvider: ''
+        llmModel: ''
+        # 转写时允许的最大输出 token 与推理档位（off / low / high；默认 off = 关闭思考）
+        rewriteMaxTokens: 800
+        rewriteReasoningEffort: off

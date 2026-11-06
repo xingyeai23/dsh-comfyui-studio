@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "ComfyUI",
+    "description": "A ComfyUI studio in the sidebar: pick a saved workflow, write a prompt in Chinese and let AI turn it into tags or English, watch live GPU/VRAM/queue activity, and preview results on the right."
+  }
+}
