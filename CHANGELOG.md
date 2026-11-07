@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 - 2026-11-07
+
+- Show a centered "ComfyUI is not connected" state with the configured address, retry/open buttons and automatic 5-second reconnect instead of a blank panel when the server is offline.
+- Wrap the panel in an error boundary so a render error shows a readable message instead of a white page.
+
 ## 0.3.0 - 2026-11-07
 
 First public release.

@@ -25,10 +25,22 @@ async function loadBundle() {
   };
   vm.runInNewContext(source, sandbox, { filename: 'lib/client.js' });
   assert.ok(captured !== null, 'bundle must call window.__ModuleLoader__.load');
+  class FakeComponent {
+    constructor(props) {
+      this.props = props;
+    }
+    setState(patch) {
+      this.state = { ...(this.state ?? {}), ...patch };
+    }
+  }
   const React = {
+    Component: FakeComponent,
     Fragment: 'Fragment',
     createElement(type, props, ...children) {
-      return { type, props: props ?? {}, children };
+      const nextProps = { ...(props ?? {}) };
+      if (children.length === 1) nextProps.children = children[0];
+      else if (children.length > 1) nextProps.children = children;
+      return { type, props: nextProps, children };
     },
     useState(value) {
       return [typeof value === 'function' ? value() : value, () => {}];
@@ -140,22 +152,21 @@ test('the studio page renders header, splitter, left controls and preview', asyn
   const { ctx, registrations } = fakeContext();
   moduleExports.apply(ctx);
   const panel = registrations.find((entry) => entry.seat.name === 'main');
-  const element = panel.component({ t: (key) => key });
-  const rendered = element.type(element.props);
+  const rendered = renderComponent(panel.component({ t: (key) => key }));
   assert.ok(rendered !== null && typeof rendered === 'object');
   const children = rendered.children.filter((child) => child !== null && child !== undefined);
   assert.ok(children.some((child) => child.type === 'style'), 'stylesheet must render');
-  const page = children.find((child) => child.props?.className === 'cs-page');
+  const page = children.find((child) => typeof child.props?.className === 'string' && child.props.className.split(' ').includes('cs-page'));
   assert.ok(page !== undefined, 'studio page must render');
   assert.equal(page.props['aria-label'], 'ComfyUI 工作室');
-  const header = page.children[0];
-  const body = page.children[1];
-  assert.equal(header.props.className, 'cs-top');
-  assert.equal(body.props.className, 'cs-body');
+  const header = page.children.find((child) => child?.props?.className === 'cs-top');
+  const body = page.children.find((child) => typeof child?.props?.className === 'string' && child.props.className.split(' ').includes('cs-body'));
+  assert.ok(header !== undefined);
+  assert.ok(body !== undefined);
   assert.ok(header.children.some((child) => child?.props?.className === 'cs-stats'), 'metrics strip must render');
-  const left = body.children[0];
-  const splitter = body.children[1];
-  const right = body.children[2];
+  const left = body.children.find((child) => typeof child?.props?.className === 'string' && child.props.className.split(' ').includes('cs-left'));
+  const splitter = body.children.find((child) => child?.props?.role === 'separator');
+  const right = body.children.find((child) => typeof child?.props?.className === 'string' && child.props.className.split(' ').includes('cs-right'));
   assert.equal(left.props.className, 'cs-left');
   assert.equal(splitter.props.role, 'separator');
   assert.equal(right.props.className, 'cs-right');
@@ -199,19 +210,36 @@ function flatten(node, out = []) {
   return out;
 }
 
+/**
+ * Render through function components and the panel error boundary until a host
+ * element tree is reached (the fake React has no reconciler).
+ * @param {any} element element or null.
+ * @returns {any} rendered element.
+ */
+function renderComponent(element) {
+  if (element === null || element === undefined || typeof element !== 'object') return element;
+  const type = element.type;
+  if (typeof type === 'function' && type.prototype !== undefined && typeof type.prototype.render === 'function') {
+    return renderComponent(new type(element.props).render());
+  }
+  if (typeof type === 'function') {
+    return renderComponent(type(element.props));
+  }
+  return element;
+}
+
 test('the studio page exposes the editor entry and no longer renders a preview card', async () => {
   const { moduleExports } = await loadBundle();
   const { ctx, registrations } = fakeContext();
   moduleExports.apply(ctx);
   const panel = registrations.find((entry) => entry.seat.name === 'main');
-  const element = panel.component({ t: (key) => key });
-  const rendered = element.type(element.props);
+  const rendered = renderComponent(panel.component({ t: (key) => key }));
   const tree = flatten(rendered);
-  const page = tree.find((node) => node.props?.className === 'cs-page');
+  const page = tree.find((node) => typeof node.props?.className === 'string' && node.props.className.split(' ').includes('cs-page'));
   assert.ok(page !== undefined);
   assert.equal(tree.some((node) => typeof node.props?.className === 'string' && /cs-graph(\s|$)/.test(node.props.className)), false, 'the old preview card must be gone');
-  const workflowSection = page.children[1].children[0].children[0];
-  assert.equal(workflowSection.props['aria-label'], '工作流选择');
+  const workflowSection = tree.find((node) => node.props?.['aria-label'] === '工作流选择');
+  assert.ok(workflowSection !== undefined, 'workflow card must render');
   const editButton = flatten(workflowSection).find((node) => node.type === 'button'
     && (Array.isArray(node.children) ? node.children : []).some((child) => child === '编辑'));
   assert.ok(editButton !== undefined, 'workflow card must offer the editor entry');
@@ -440,6 +468,24 @@ test('the editor can embed the official ComfyUI web UI', async () => {
   moduleExports.apply(ctx);
   const zh = dictionaries[0].dicts.zh;
   for (const key of ['editor.native', 'editor.builtin', 'editor.nativeTitle', 'editor.nativeHint', 'editor.openExternal', 'tutorial.nativeTitle', 'tutorial.native']) {
+    assert.ok(Object.hasOwn(zh, key), key);
+  }
+});
+
+test('an offline panel shows a start-ComfyUI prompt and catches render errors', async () => {
+  const { source } = await loadBundle();
+  assert.match(source, /'offline\.title': '还没有连接到 ComfyUI'/);
+  assert.match(source, /'offline\.desc': '请先启动 ComfyUI 服务/);
+  assert.match(source, /class PanelErrorBoundary extends React\.Component/);
+  assert.match(source, /className: 'cs-offline'/);
+  assert.match(source, /cs-body--connection/);
+  assert.match(source, /setInterval\(\(\) => \{[\s\S]*?\}, 5000\);/);
+  assert.match(source, /const retryConnection = async/);
+  const { moduleExports } = await loadBundle();
+  const { ctx, dictionaries } = fakeContext();
+  moduleExports.apply(ctx);
+  const zh = dictionaries[0].dicts.zh;
+  for (const key of ['offline.title', 'offline.desc', 'offline.retry', 'offline.open', 'offline.copy', 'offline.auto', 'offline.hint', 'crash.title']) {
     assert.ok(Object.hasOwn(zh, key), key);
   }
 });
