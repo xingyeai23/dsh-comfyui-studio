@@ -474,18 +474,18 @@ test('the editor can embed the official ComfyUI web UI', async () => {
 
 test('an offline panel shows a start-ComfyUI prompt and catches render errors', async () => {
   const { source } = await loadBundle();
-  assert.match(source, /'offline\.title': '还没有连接到 ComfyUI'/);
-  assert.match(source, /'offline\.desc': '请先启动 ComfyUI 服务/);
+  assert.match(source, /'offline\.title': '还没有检测到 ComfyUI'/);
+  assert.match(source, /'offline\.desc': '请先安装并启动 ComfyUI/);
   assert.match(source, /class PanelErrorBoundary extends React\.Component/);
-  assert.match(source, /className: 'cs-offline'/);
-  assert.match(source, /cs-body--connection/);
+  assert.match(source, /className: 'cs-offline-page'/);
+  assert.match(source, /COMFY_DOWNLOAD_URL = 'https:\/\/www\.comfy\.org\/download'/);
   assert.match(source, /setInterval\(\(\) => \{[\s\S]*?\}, 5000\);/);
   assert.match(source, /const retryConnection = async/);
   const { moduleExports } = await loadBundle();
   const { ctx, dictionaries } = fakeContext();
   moduleExports.apply(ctx);
   const zh = dictionaries[0].dicts.zh;
-  for (const key of ['offline.title', 'offline.desc', 'offline.retry', 'offline.open', 'offline.copy', 'offline.auto', 'offline.hint', 'crash.title']) {
+  for (const key of ['offline.title', 'offline.desc', 'offline.retry', 'offline.open', 'offline.copy', 'offline.auto', 'offline.hint', 'offline.step1Title', 'offline.step2Title', 'offline.step3Title', 'offline.download', 'offline.guide', 'offline.github', 'crash.title']) {
     assert.ok(Object.hasOwn(zh, key), key);
   }
 });
