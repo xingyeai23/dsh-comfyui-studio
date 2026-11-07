@@ -479,6 +479,7 @@ test('an offline panel shows a start-ComfyUI prompt and catches render errors', 
   assert.match(source, /class PanelErrorBoundary extends React\.Component/);
   assert.match(source, /className: 'cs-offline-page'/);
   assert.match(source, /COMFY_DOWNLOAD_URL = 'https:\/\/www\.comfy\.org\/download'/);
+  assert.match(source, /snapshot\.models !== null && typeof snapshot\.models === 'object' \? snapshot\.models : null/);
   assert.match(source, /setInterval\(\(\) => \{[\s\S]*?\}, 5000\);/);
   assert.match(source, /const retryConnection = async/);
   const { moduleExports } = await loadBundle();
