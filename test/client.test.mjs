@@ -482,6 +482,8 @@ test('an offline panel shows a start-ComfyUI prompt and catches render errors', 
   assert.match(source, /snapshot\.models !== null && typeof snapshot\.models === 'object' \? snapshot\.models : null/);
   assert.match(source, /setInterval\(\(\) => \{[\s\S]*?\}, 5000\);/);
   assert.match(source, /const retryConnection = async/);
+  assert.match(source, /\.cs-offline-actions \.cs-btn \{ min-width: 104px; justify-content: center; \}/);
+  assert.match(source, /'aria-busy': offlineRetrying/);
   const { moduleExports } = await loadBundle();
   const { ctx, dictionaries } = fakeContext();
   moduleExports.apply(ctx);
