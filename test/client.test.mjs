@@ -485,7 +485,7 @@ test('an offline panel shows a start-ComfyUI prompt and catches render errors', 
   const { ctx, dictionaries } = fakeContext();
   moduleExports.apply(ctx);
   const zh = dictionaries[0].dicts.zh;
-  for (const key of ['offline.title', 'offline.desc', 'offline.retry', 'offline.open', 'offline.copy', 'offline.auto', 'offline.hint', 'offline.step1Title', 'offline.step2Title', 'offline.step3Title', 'offline.download', 'offline.guide', 'offline.github', 'crash.title']) {
+  for (const key of ['offline.title', 'offline.desc', 'offline.retry', 'offline.open', 'offline.copy', 'offline.auto', 'offline.hint', 'offline.step1Title', 'offline.step2Title', 'offline.step3Title', 'offline.download', 'offline.desktopGuide', 'offline.portableGuide', 'offline.github', 'offline.portHint', 'offline.localDesktop', 'offline.localPortable', 'crash.title']) {
     assert.ok(Object.hasOwn(zh, key), key);
   }
 });
