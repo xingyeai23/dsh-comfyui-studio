@@ -77,6 +77,10 @@ Press **Edit** on the workflow card. The canvas slides up; rename / delete the w
 
 ![Editor](https://raw.githubusercontent.com/xingyeai23/dsh-comfyui-studio/main/docs/screenshot-editor.png)
 
+The **Native canvas** button switches to the embedded official ComfyUI page:
+
+![Native ComfyUI canvas](https://raw.githubusercontent.com/xingyeai23/dsh-comfyui-studio/main/docs/screenshot-native.png)
+
 ### LoRA, params and preview
 
 - **LoRA card**: choose a file, adjust model / CLIP strength, uncheck Enabled to bypass the LoRA node.

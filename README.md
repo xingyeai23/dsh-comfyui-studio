@@ -89,6 +89,10 @@ Host 会把 ComfyUI 的前端图（`nodes` + `links` + 控件值）转换成 `/p
 
 ![工作流编辑画布](https://raw.githubusercontent.com/xingyeai23/dsh-comfyui-studio/main/docs/screenshot-editor.png)
 
+工具栏的「原生画布」可以切换成内嵌的 ComfyUI 官方网页：
+
+![原生 ComfyUI 画布](https://raw.githubusercontent.com/xingyeai23/dsh-comfyui-studio/main/docs/screenshot-native.png)
+
 ### LoRA 快捷编辑
 
 工作流里存在 `LoraLoader` / `LoraLoaderModelOnly` 节点时，左侧出现 LoRA 卡片：选文件、改模型 / CLIP 强度、勾选「启用」。取消启用会在提交时绕过该 LoRA 节点，与画布里的 Ctrl+B 等效。
