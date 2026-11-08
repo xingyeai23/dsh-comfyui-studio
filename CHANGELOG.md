@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5 - 2026-11-08
+
+- Remove the duplicate "collapse" button and status from the native-canvas toolbar; the header keeps the single collapse action.
+
 ## 0.3.4 - 2026-11-08
 
 - Hide the native-canvas entry on Windows desktop for now; it still loads unreliably there. macOS and DSH Web keep the embedded ComfyUI canvas.
