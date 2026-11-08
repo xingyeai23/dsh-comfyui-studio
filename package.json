@@ -48,7 +48,16 @@
     "lora",
     "image-generation",
     "workflow",
-    "plugin"
+    "plugin",
+    "stable-diffusion",
+    "sdxl",
+    "flux",
+    "anima",
+    "noobai",
+    "prompt",
+    "node-editor",
+    "workflow-editor",
+    "local-ai"
   ],
   "author": "xingyeai23",
   "repository": {

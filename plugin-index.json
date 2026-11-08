@@ -62,7 +62,17 @@
           "lora",
           "workflow",
           "image",
-          "seed"
+          "seed",
+          "stable-diffusion",
+          "sdxl",
+          "flux",
+          "anima",
+          "noobai",
+          "prompt",
+          "node-editor",
+          "workflow-editor",
+          "image-generation",
+          "local-ai"
         ]
       },
       "versions": [

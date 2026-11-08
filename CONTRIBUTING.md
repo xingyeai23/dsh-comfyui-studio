@@ -43,8 +43,13 @@ node scripts/verify.mjs --rewrite "一只戴红围巾的白猫"
 1. 更新 `CHANGELOG.md`、`package.json`、`lib/comfy.js` 的 `PLUGIN_VERSION`，三者版本号一致；
 2. 运行 `node scripts/verify.mjs`；
 3. 提交并推送，创建并推送 tag（例如 `v0.3.4`）；
-4. GitHub Actions 会校验 tag 与 `package.json` 一致、跑测试，然后执行 `npm publish --provenance --access public`；
-5. 发布后更新 `plugin-index.json` 的版本和发布时间。
+4. GitHub Actions 会自动完成：
+   - 校验 tag 与 `package.json` 一致、跑测试；
+   - `npm pack --dry-run` 检查 tarball 内容；
+   - 把 tarball 安装到干净目录，验证 `dsh.bundle` 存在；
+   - `npm publish --provenance --access public` 并等待 npm 上出现该版本；
+   - 运行 `node scripts/sync-release.mjs <version>`，自动提交并推送 `plugin-index.json`；
+   - 创建对应 GitHub Release。
 
 首次配置：在 npm 包页面 → **Settings → Publishing access → Trusted Publisher → GitHub Actions**，填写：
 
@@ -58,6 +63,9 @@ node scripts/verify.mjs --rewrite "一只戴红围巾的白猫"
 ```bash
 npm login
 npm publish --otp=<6 位验证码>
+node scripts/sync-release.mjs <version>
+git add plugin-index.json && git commit -m "Point plugin index at <version>" && git push
+gh release create "v<version>" --title "v<version>" --notes-file CHANGELOG.md
 ```
 
 本地发布会缺少 provenance；正常发布请优先用 tag + workflow。

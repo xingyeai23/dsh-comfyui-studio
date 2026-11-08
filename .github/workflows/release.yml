@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -35,5 +37,56 @@ jobs:
           VERSION="$(node -p "require('./package.json').version")"
           test "$TAG" = "$VERSION"
 
+      - name: Inspect the package contents
+        run: npm pack --dry-run
+
+      - name: Install the packed tarball in a clean directory
+        run: |
+          TARBALL="$(npm pack --silent)"
+          mkdir -p /tmp/dsh-comfyui-studio-install
+          cd /tmp/dsh-comfyui-studio-install
+          npm init -y >/dev/null
+          npm install --silent "${GITHUB_WORKSPACE}/${TARBALL}"
+          node -e "const p=require('dsh-comfyui-studio/package.json'); if (!p.dsh?.bundle?.patch) process.exit(1); console.log(p.name, p.version, p.dsh.bundle.patch)"
+          rm -f "${GITHUB_WORKSPACE}/${TARBALL}"
+
       - name: Publish with provenance
         run: npm publish --provenance --access public
+
+      - name: Wait for the published version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          for attempt in $(seq 1 12); do
+            PUBLISHED="$(npm view "dsh-comfyui-studio@${VERSION}" version --prefer-online 2>/dev/null | tail -n 1)"
+            if [ "${PUBLISHED}" = "${VERSION}" ]; then
+              echo "dsh-comfyui-studio@${VERSION} is live"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "npm did not expose dsh-comfyui-studio@${VERSION} in time" >&2
+          exit 1
+
+      - name: Sync the plugin index
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+          node scripts/sync-release.mjs "${TAG}"
+          if git diff --quiet -- plugin-index.json; then
+            echo "plugin index already points at ${TAG}"
+            exit 0
+          fi
+          git add plugin-index.json
+          git commit -m "Point plugin index at ${TAG}"
+          git push origin main
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${GITHUB_REF_NAME#v}"
+          gh release view "${TAG}" >/dev/null 2>&1 || gh release create "${TAG}" --title "${TAG}" --notes-file CHANGELOG.md
