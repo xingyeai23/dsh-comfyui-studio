@@ -134,4 +134,4 @@ See [CONTRIBUTING.md](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main
 
 ## License
 
-MIT. Community plugin, not an official ComfyUI or DeepSeek Harness project.
+MIT. Community plugin, not an official ComfyUI or DeepSeek Harness project. Security reports: see [SECURITY.md](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/SECURITY.md).

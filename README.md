@@ -182,4 +182,4 @@ MIT，见 [LICENSE](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/L
 
 ---
 
-更多文档：[API 路由](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/API.md) · [设计说明](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/DESIGN.md) · [完整故障排查](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/TROUBLESHOOTING.md) · [模型说明](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/MODELS.md) · [贡献指南](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/CONTRIBUTING.md)
+更多文档：[API 路由](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/API.md) · [设计说明](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/DESIGN.md) · [完整故障排查](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/TROUBLESHOOTING.md) · [模型说明](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/docs/MODELS.md) · [贡献指南](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/CONTRIBUTING.md) · [安全策略](https://github.com/xingyeai23/dsh-comfyui-studio/blob/main/SECURITY.md)

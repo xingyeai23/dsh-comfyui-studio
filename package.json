@@ -24,7 +24,8 @@
     "README.md",
     "README.en.md",
     "LICENSE",
-    "plugin-index.json"
+    "plugin-index.json",
+    "SECURITY.md"
   ],
   "engines": {
     "node": ">=20.3.0",

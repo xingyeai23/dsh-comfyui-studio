@@ -38,11 +38,29 @@ node scripts/verify.mjs --rewrite "一只戴红围巾的白猫"
 
 ## 发布
 
-1. 更新 `CHANGELOG.md` 和 `package.json` 版本号（`lib/comfy.js` 的 `PLUGIN_VERSION` 必须同步）；
+发布由 GitHub Actions 的 `.github/workflows/release.yml` 完成（npm trusted publishing + provenance），推送 tag 即触发：
+
+1. 更新 `CHANGELOG.md`、`package.json`、`lib/comfy.js` 的 `PLUGIN_VERSION`，三者版本号一致；
 2. 运行 `node scripts/verify.mjs`；
-3. 提交并推送，创建对应 tag；
-4. `npm publish`（发布后 npm 上的 `latest` 会出现在 README 徽章里）；
-5. 如果安装方式走 Git 源，同步更新 `plugin-index.json` 的版本和 commit。
+3. 提交并推送，创建并推送 tag（例如 `v0.3.4`）；
+4. GitHub Actions 会校验 tag 与 `package.json` 一致、跑测试，然后执行 `npm publish --provenance --access public`；
+5. 发布后更新 `plugin-index.json` 的版本和发布时间。
+
+首次配置：在 npm 包页面 → **Settings → Publishing access → Trusted Publisher → GitHub Actions**，填写：
+
+- Organization/user：`xingyeai23`
+- Repository：`dsh-comfyui-studio`
+- Workflow filename：`release.yml`
+- Environment：留空
+
+本地应急发布（trusted publishing 不可用时）：
+
+```bash
+npm login
+npm publish --otp=<6 位验证码>
+```
+
+本地发布会缺少 provenance；正常发布请优先用 tag + workflow。
 
 ## 问题反馈
 
