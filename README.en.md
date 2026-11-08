@@ -52,7 +52,7 @@ Start ComfyUI:
 - **ComfyUI Desktop**: launch an instance; default port `8188`;
 - **Windows portable**: run `run_nvidia_gpu.bat`; default port `8188`.
 
-If the address differs, edit it in the input (e.g. `192.168.1.10:8188`) and press **Save and connect**. The address is remembered and reconnects every 5 seconds.
+If the address differs, edit it in the input (e.g. `192.168.1.10:8188`) and press **Save and connect**, or press **Scan LAN** to find a server on the same network. The address is remembered and reconnects every 5 seconds.
 
 ![First run](https://raw.githubusercontent.com/xingyeai23/dsh-comfyui-studio/main/docs/screenshot-offline.png)
 

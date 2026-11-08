@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 - 2026-11-08
+
+- Add a "Scan LAN" button to the first-run screen; found ComfyUI servers can be selected with one click.
+- Keep the retry action buttons stable while reconnecting.
+- Correct the first-run examples: ComfyUI Desktop and the Windows portable build both default to port 8188 (with 8000 references removed).
+
 ## 0.3.1 - 2026-11-07
 
 - Docs: shorter README focused on install/first use, with screenshots; API/design/troubleshooting/model docs split into `docs/`.

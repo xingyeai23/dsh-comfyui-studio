@@ -484,11 +484,13 @@ test('an offline panel shows a start-ComfyUI prompt and catches render errors', 
   assert.match(source, /const retryConnection = async/);
   assert.match(source, /\.cs-offline-actions \.cs-btn \{ min-width: 104px; justify-content: center; \}/);
   assert.match(source, /'aria-busy': offlineRetrying/);
+  assert.match(source, /const scanLan = async/);
+  assert.match(source, /className: 'cs-offline-found'/);
   const { moduleExports } = await loadBundle();
   const { ctx, dictionaries } = fakeContext();
   moduleExports.apply(ctx);
   const zh = dictionaries[0].dicts.zh;
-  for (const key of ['offline.title', 'offline.desc', 'offline.retry', 'offline.open', 'offline.saveAddress', 'offline.invalidAddress', 'offline.connectFailed', 'offline.step1Title', 'offline.step2Title', 'offline.step3Title', 'offline.download', 'offline.desktopGuide', 'offline.portableGuide', 'offline.github', 'crash.title']) {
+  for (const key of ['offline.title', 'offline.desc', 'offline.retry', 'offline.open', 'offline.saveAddress', 'offline.invalidAddress', 'offline.connectFailed', 'offline.step1Title', 'offline.step2Title', 'offline.step3Title', 'offline.download', 'offline.desktopGuide', 'offline.portableGuide', 'offline.github', 'offline.discover', 'offline.discovering', 'offline.discoverEmpty', 'offline.discoverFailed', 'crash.title']) {
     assert.ok(Object.hasOwn(zh, key), key);
   }
 });
