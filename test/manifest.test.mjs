@@ -73,9 +73,11 @@ test('the icon is a small valid SVG', async () => {
 
 test('the README documents the studio, the workflow conversion and AI rewrite', async () => {
   const readme = await read('README.md');
+  const api = await read('docs/API.md');
   assert.match(readme, /comfyui-studio/);
-  assert.match(readme, /\/comfyui-panel\/workflows/);
-  assert.match(readme, /\/comfyui-panel\/generate/);
-  assert.match(readme, /\/comfyui-panel\/rewrite/);
+  assert.match(readme, /screenshot-main\.png/);
+  assert.match(api, /\/comfyui-panel\/workflows/);
+  assert.match(api, /\/comfyui-panel\/generate/);
+  assert.match(api, /\/comfyui-panel\/rewrite/);
   assert.match(readme, /baseUrl/);
 });
