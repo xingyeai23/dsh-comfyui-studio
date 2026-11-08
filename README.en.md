@@ -20,7 +20,7 @@ Opening the ComfyUI web page means tab switching, cleaning A1111 parameter dumps
 - **Asset checks** — missing checkpoints, VAEs and LoRAs are reported with file names and target folders.
 - **LoRA quick edit** — choose the file, adjust model / CLIP strength or bypass the node without opening the graph.
 - **Built-in node editor** — slide-up canvas with drag, zoom, right-click add / edit / bypass / delete, and save back to ComfyUI.
-- **Native canvas** — embed the official ComfyUI web UI on DSH Web or with an HTTPS ComfyUI; desktop shells show an "open in browser / copy address" fallback instead of a blank frame.
+- **Native canvas** — embed the official ComfyUI web UI in the same sheet; switch back to the built-in canvas for the simplified editor.
 - **Full-screen preview** — fade / zoom, prev / next, download, copy to clipboard, remove from results, and show / copy the seed.
 - **Live stats** — VRAM, RAM, queue and activity cards, with a real WebSocket queue progress bar.
 - **AI prompts** — tag or natural-language rewriting based on the checkpoint, plus a Chinese reference translation.

@@ -483,7 +483,6 @@ test('an offline panel shows a start-ComfyUI prompt and catches render errors', 
   assert.match(source, /setInterval\(\(\) => \{[\s\S]*?\}, 5000\);/);
   assert.match(source, /const retryConnection = async/);
   assert.match(source, /\}, \[nativeCanvas\]\);/);
-  assert.match(source, /cs-native-fallback/);
   assert.match(source, /\.cs-offline-actions \.cs-btn \{ min-width: 104px; justify-content: center; \}/);
   assert.match(source, /'aria-busy': offlineRetrying/);
   assert.match(source, /const scanLan = async/);

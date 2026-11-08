@@ -4,7 +4,7 @@
 
 - Fix canvas mouse-wheel zoom after switching back from the native canvas.
 - Apply the desktop titlebar clearance on Windows as well, so the editor toolbar no longer overlaps the window controls.
-- Desktop shells cannot embed http ComfyUI pages (secure `dsh-app:` origin); show a clear fallback with "Open in browser", "Copy address" and "Built-in canvas".
+- Keep the native ComfyUI iframe on desktop; a blank frame usually means the configured address is unreachable or the ComfyUI page is blocked by its own server.
 
 ## 0.3.2 - 2026-11-08
 
