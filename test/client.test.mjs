@@ -485,6 +485,8 @@ test('an offline panel shows a start-ComfyUI prompt and catches render errors', 
   assert.match(source, /\}, \[nativeCanvas\]\);/);
   assert.match(source, /\.cs-offline-actions \.cs-btn \{ min-width: 104px; justify-content: center; \}/);
   assert.match(source, /'aria-busy': offlineRetrying/);
+  assert.match(source, /hideNativeCanvasOnThisPlatform/);
+  assert.match(source, /platform === 'win32'/);
   assert.match(source, /const scanLan = async/);
   assert.match(source, /className: 'cs-offline-found'/);
   const { moduleExports } = await loadBundle();

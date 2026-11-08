@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.4 - 2026-11-08
+
+- Hide the native-canvas entry on Windows desktop for now; it still loads unreliably there. macOS and DSH Web keep the embedded ComfyUI canvas.
+- Release via GitHub Actions trusted publishing with npm provenance.
+
 ## 0.3.3 - 2026-11-08
 
 - Fix canvas mouse-wheel zoom after switching back from the native canvas.
