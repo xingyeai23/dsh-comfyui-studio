@@ -481,6 +481,23 @@ test('live exposes WebSocket progress and generate submits with its client id', 
   }
 });
 
+test('open route asks the Host to launch the configured ComfyUI in the browser', async () => {
+  const opened = [];
+  const handler = handlerFor('http://127.0.0.1:8188', {
+    openExternal: async (url) => { opened.push(url); },
+  });
+  const response = await invoke(handler, {
+    method: 'POST',
+    url: `${PREFIX}/open`,
+    headers: { 'content-type': 'application/json' },
+    body: { base: 'http://127.0.0.1:8188/' },
+  });
+  assert.equal(response.status, 200);
+  assert.deepEqual(opened, ['http://127.0.0.1:8188']);
+  const wrongMethod = await invoke(handler, { url: `${PREFIX}/open` });
+  assert.equal(wrongMethod.status, 405);
+});
+
 test('rewrite route proxies the Host rewrite function and reports failures', async () => {
   const fake = await startFakeComfy();
   const ok = handlerFor(fake.url, {

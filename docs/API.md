@@ -18,6 +18,7 @@
 | POST | `/comfyui-panel/rewrite` | `{text, kind:'tags'\|'natural'\|'both'\|'zh'}` |
 | GET | `/comfyui-panel/job?base=&id=` | 任务状态 |
 | GET | `/comfyui-panel/view?base=&filename=&subfolder=&type=` | 代理输出图片 |
+| POST | `/comfyui-panel/open` | 在系统浏览器打开 `{base}`（桌面版内嵌被拦截时使用） |
 | POST | `/comfyui-panel/interrupt` | 中断当前任务 |
 | POST | `/comfyui-panel/queue/clear` | 清空排队 |
 | POST | `/comfyui-panel/connect` | 探测地址（脚本可用） |
