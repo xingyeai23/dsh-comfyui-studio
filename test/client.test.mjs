@@ -497,3 +497,13 @@ test('an offline panel shows a start-ComfyUI prompt and catches render errors', 
     assert.ok(Object.hasOwn(zh, key), key);
   }
 });
+
+test('the frontend uses modern platform primitives', async () => {
+  const { source } = await loadBundle();
+  assert.match(source, /dialog\.cs-lightbox \{/);
+  assert.match(source, /dialog\.cs-lightbox::backdrop/);
+  assert.match(source, /field-sizing: content/);
+  assert.match(source, /@container \(max-width: 980px\)/);
+  assert.match(source, /color-scheme: light dark/);
+  assert.match(source, /event\.isComposing/);
+});
