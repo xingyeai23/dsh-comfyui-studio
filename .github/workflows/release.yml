@@ -56,13 +56,13 @@ jobs:
       - name: Wait for the published version
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          for attempt in $(seq 1 12); do
+          for attempt in $(seq 1 40); do
             PUBLISHED="$(npm view "dsh-comfyui-studio@${VERSION}" version --prefer-online 2>/dev/null | tail -n 1)"
             if [ "${PUBLISHED}" = "${VERSION}" ]; then
               echo "dsh-comfyui-studio@${VERSION} is live"
               exit 0
             fi
-            sleep 10
+            sleep 15
           done
           echo "npm did not expose dsh-comfyui-studio@${VERSION} in time" >&2
           exit 1
