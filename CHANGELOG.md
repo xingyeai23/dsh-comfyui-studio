@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.7 - 2026-11-12
+
+- Release: npm visibility and index sync retry independently; a metadata delay no longer skips the GitHub Release, and a failed index sync is surfaced with a repair path.
+- Add a manually runnable **Repair plugin index** workflow for post-publish recovery.
+- `plugin-index.json` now lists every published version that declares `dsh.bundle`, newest first, so the market can offer older versions for rollback.
+- Editor: fit the view before mounting the node graph and fade the graph in instead of popping it onto a blank canvas.
+- Preview: fix the exit fade selector and show the backdrop blur immediately on open.
+
 ## 0.3.6 - 2026-11-11
 
 - Modernize the client frontend: native `<dialog>` lightbox with top-layer/focus handling, `field-sizing` prompt textarea, container-query panel layout, browser theme integration and IME-safe address entry.

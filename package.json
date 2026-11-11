@@ -1,6 +1,6 @@
 {
   "name": "dsh-comfyui-studio",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "ComfyUI studio for DeepSeek Harness: saved workflows, prompts, LoRA quick edit, node editor and image lightbox.",
   "type": "module",
   "main": "lib/host.js",

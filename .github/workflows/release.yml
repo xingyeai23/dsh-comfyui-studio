@@ -12,6 +12,7 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
         with:
@@ -53,7 +54,9 @@ jobs:
       - name: Publish with provenance
         run: npm publish --provenance --access public
 
-      - name: Wait for the published version
+      - name: Wait until npm exposes the version
+        id: npm-visible
+        continue-on-error: true
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           for attempt in $(seq 1 40); do
@@ -64,24 +67,39 @@ jobs:
             fi
             sleep 15
           done
-          echo "npm did not expose dsh-comfyui-studio@${VERSION} in time" >&2
+          echo "::warning::npm published dsh-comfyui-studio@${VERSION} but its metadata is still propagating; index sync will retry."
           exit 1
 
       - name: Sync the plugin index
+        id: sync-index
+        continue-on-error: true
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
+          VERSION="${GITHUB_REF_NAME#v}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
           git checkout main
           git pull --ff-only origin main
-          node scripts/sync-release.mjs "${TAG}"
+
+          SYNCED=false
+          for attempt in $(seq 1 40); do
+            if node scripts/sync-release.mjs "${VERSION}"; then
+              SYNCED=true
+              break
+            fi
+            sleep 15
+          done
+          if [ "${SYNCED}" != "true" ]; then
+            echo "::error::Could not sync plugin-index.json for dsh-comfyui-studio@${VERSION} after retries."
+            exit 1
+          fi
+
           if git diff --quiet -- plugin-index.json; then
-            echo "plugin index already points at ${TAG}"
+            echo "plugin index already contains ${VERSION}"
             exit 0
           fi
           git add plugin-index.json
-          git commit -m "Point plugin index at ${TAG}"
+          git commit -m "Point plugin index at ${VERSION}"
           git push origin main
 
       - name: Create the GitHub release
@@ -90,3 +108,10 @@ jobs:
         run: |
           TAG="v${GITHUB_REF_NAME#v}"
           gh release view "${TAG}" >/dev/null 2>&1 || gh release create "${TAG}" --title "${TAG}" --notes-file CHANGELOG.md
+
+      - name: Surface a deferred index repair
+        if: steps.sync-index.outcome != 'success'
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "::error::npm published dsh-comfyui-studio@${VERSION} but plugin-index.json was not synced. Run the 'Repair plugin index' workflow with version ${VERSION}."
+          exit 1

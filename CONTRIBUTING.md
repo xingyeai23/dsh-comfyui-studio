@@ -47,9 +47,11 @@ node scripts/verify.mjs --rewrite "一只戴红围巾的白猫"
    - 校验 tag 与 `package.json` 一致、跑测试；
    - `npm pack --dry-run` 检查 tarball 内容；
    - 把 tarball 安装到干净目录，验证 `dsh.bundle` 存在；
-   - `npm publish --provenance --access public` 并等待 npm 上出现该版本；
-   - 运行 `node scripts/sync-release.mjs <version>`，自动提交并推送 `plugin-index.json`；
-   - 创建对应 GitHub Release。
+   - `npm publish --provenance --access public`；
+   - 等待 npm 暴露新版本，并独立重试同步 `plugin-index.json`（保留全部已发布版本）；
+   - 即使 npm 元数据传播较慢，也会继续创建 GitHub Release；索引同步失败时任务会报错并提供修复提示。
+
+5. 如果发布任务提示索引未同步：Actions → **Repair plugin index** → Run workflow，填入刚发布的版本号。该任务会从 npm 重建完整版本列表并提交 `plugin-index.json`，不会重新发布 npm。
 
 首次配置：在 npm 包页面 → **Settings → Publishing access → Trusted Publisher → GitHub Actions**，填写：
 

@@ -1,0 +1,44 @@
+name: Repair plugin index
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Published npm version to use as the newest plugin-index entry'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Rebuild the index from npm
+        env:
+          VERSION: ${{ inputs.version }}
+        run: node scripts/sync-release.mjs "$VERSION"
+
+      - name: Commit and push the repaired index
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add plugin-index.json
+          if git diff --cached --quiet; then
+            echo "plugin index already contains ${VERSION}"
+            exit 0
+          fi
+          git commit -m "Repair plugin index at ${VERSION}"
+          git push origin HEAD:main
