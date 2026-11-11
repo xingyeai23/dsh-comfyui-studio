@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.6 - 2026-11-11
+
+- Modernize the client frontend: native `<dialog>` lightbox with top-layer/focus handling, `field-sizing` prompt textarea, container-query panel layout, browser theme integration and IME-safe address entry.
+- Expand DSH discovery keywords (stable-diffusion, sdxl, flux, anima, noobai, prompt, node-editor, workflow-editor, local-ai).
+- Add LAN scanning to the first-run connection screen.
+- Automate releases: npm provenance, tarball dry-run and clean install checks, plugin-index sync and GitHub Release.
+- Keep the Windows native-canvas entry hidden for now.
+
 ## 0.3.5 - 2026-11-08
 
 - Remove the duplicate "collapse" button and status from the native-canvas toolbar; the header keeps the single collapse action.
