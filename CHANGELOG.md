@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8 - 2026-11-14
+
+- Fix `widgets_values` alignment when some widgets are linked: linked width/height no longer shift `batch_size` (which could trigger CUDA OOM).
+- Support `extensions.seed_widgets` and seed control values so video/custom nodes keep their following widget values aligned.
+- Show unsupported workflows in the picker instead of dropping them silently, with reasons in the tooltip and details dialog.
+
 ## 0.3.7 - 2026-11-12
 
 - Release: npm visibility and index sync retry independently; a metadata delay no longer skips the GitHub Release, and a failed index sync is surfaced with a repair path.
