@@ -507,3 +507,10 @@ test('the frontend uses modern platform primitives', async () => {
   assert.match(source, /color-scheme: light dark/);
   assert.match(source, /event\.isComposing/);
 });
+
+test('unsupported workflows stay visible in the picker with their reasons', async () => {
+  const { source } = await loadBundle();
+  assert.match(source, /const workflowOptions = workflows === null \? \[\] : workflows;/);
+  assert.match(source, /workflowOptions\.map\(\(workflow\)/);
+  assert.match(source, /workflow\.reasons\.join/);
+});

@@ -261,3 +261,59 @@ test('applyOverrides edits LoRA loaders and bypasses disabled ones end to end', 
   // the original conversion object is never mutated
   assert.equal(converted.prompt['2'].inputs.lora_name, 'old.safetensors');
 });
+
+test('linked widget values still consume their widgets_values slot', () => {
+  const workflow = clone(SIMPLE_WORKFLOW);
+  const latent = workflow.nodes.find((node) => node.id === 4);
+  latent.type = 'EmptyFlux2LatentImage';
+  latent.inputs = [
+    { name: 'width', type: 'INT', widget: { name: 'width' }, link: 10 },
+    { name: 'height', type: 'INT', widget: { name: 'height' }, link: 11 },
+    { name: 'batch_size', type: 'INT', widget: { name: 'batch_size' }, link: null },
+  ];
+  latent.widgets_values = [848, 1280, 1];
+  workflow.nodes.push({ id: 20, type: 'PrimitiveNode', mode: 0, inputs: [], outputs: [], widgets_values: [848] });
+  workflow.nodes.push({ id: 21, type: 'PrimitiveNode', mode: 0, inputs: [], outputs: [], widgets_values: [1280] });
+  workflow.links.push([10, 20, 0, 4, 0, 'INT']);
+  workflow.links.push([11, 21, 0, 4, 1, 'INT']);
+
+  const objectInfo = docs();
+  objectInfo.set('EmptyFlux2LatentImage', {
+    input: { required: { width: ['INT', {}], height: ['INT', {}], batch_size: ['INT', {}] } },
+    output: ['LATENT'],
+  });
+  const conversion = convertWorkflow(workflow, objectInfo);
+  assert.equal(conversion.prompt['4'].inputs.width, 848);
+  assert.equal(conversion.prompt['4'].inputs.height, 1280);
+  assert.equal(conversion.prompt['4'].inputs.batch_size, 1);
+});
+
+test('seed_widgets controls do not shift following widget values', () => {
+  const workflow = clone(SIMPLE_WORKFLOW);
+  const sampler = workflow.nodes.find((node) => node.id === 5);
+  sampler.type = 'SelfLiftH3Sampler';
+  sampler.widgets_values = [1004877498345751, 'randomize', 30, 4, 'er_sde', 'simple', 1];
+  workflow.extensions = { seed_widgets: { 5: 0 } };
+
+  const objectInfo = docs();
+  objectInfo.set('SelfLiftH3Sampler', {
+    input: {
+      required: {
+        seed: ['INT', {}],
+        steps: ['INT', {}],
+        cfg: ['FLOAT', {}],
+        sampler_name: ['COMBO', { options: ['er_sde', 'euler'] }],
+        scheduler: ['COMBO', { options: ['simple', 'normal'] }],
+        denoise: ['FLOAT', {}],
+      },
+    },
+    output: ['LATENT'],
+  });
+  const conversion = convertWorkflow(workflow, objectInfo);
+  assert.equal(conversion.prompt['5'].inputs.seed, 1004877498345751);
+  assert.equal(conversion.prompt['5'].inputs.steps, 30);
+  assert.equal(conversion.prompt['5'].inputs.cfg, 4);
+  assert.equal(conversion.prompt['5'].inputs.sampler_name, 'er_sde');
+  assert.equal(conversion.prompt['5'].inputs.scheduler, 'simple');
+  assert.equal(conversion.prompt['5'].inputs.denoise, 1);
+});
