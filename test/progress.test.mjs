@@ -98,3 +98,18 @@ test('reduceProgress tracks executed and cached nodes for the graph preview', ()
   state = reduceProgress(state, { type: 'execution_success', data: { prompt_id: 'p2' } });
   assert.equal(state.status, 'completed');
 });
+
+test('reduceProgress isolates concurrent prompts and resets per-node stepping', () => {
+  let state = reduceProgress(null, { type: 'execution_start', data: { prompt_id: 'p1' } });
+  state = reduceProgress(state, { type: 'progress', data: { prompt_id: 'p1', node: '5', value: 10, max: 10 } });
+  assert.equal(state.percent, 100);
+
+  const switched = reduceProgress(state, { type: 'executing', data: { prompt_id: 'p1', node: '6' } });
+  assert.equal(switched.node, '6');
+  assert.equal(switched.value, 0);
+  assert.equal(switched.max, 0);
+  assert.equal(switched.percent, 0);
+
+  const otherPrompt = reduceProgress(switched, { type: 'progress', data: { prompt_id: 'p2', node: '9', value: 3, max: 6 } });
+  assert.equal(otherPrompt, switched, 'events for a different prompt must not change the active state');
+});
