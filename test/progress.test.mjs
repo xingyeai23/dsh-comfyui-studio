@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createProgressTracker, reduceProgress } from '../lib/progress.js';
+import { createProgressTracker, parseBinaryPreview, reduceProgress } from '../lib/progress.js';
 
 test('reduceProgress follows execution, progress and completion messages', () => {
   let state = reduceProgress(null, { type: 'execution_start', data: { prompt_id: 'p1' } });
@@ -112,4 +112,36 @@ test('reduceProgress isolates concurrent prompts and resets per-node stepping', 
 
   const otherPrompt = reduceProgress(switched, { type: 'progress', data: { prompt_id: 'p2', node: '9', value: 3, max: 6 } });
   assert.equal(otherPrompt, switched, 'events for a different prompt must not change the active state');
+});
+
+test('parseBinaryPreview decodes ComfyUI JPEG/PNG preview frames and tracker stores previewDataUrl', () => {
+  const headerJpeg = Buffer.alloc(8);
+  headerJpeg.writeUInt32BE(1, 0);
+  headerJpeg.writeUInt32BE(1, 4);
+  const jpegFrame = Buffer.concat([headerJpeg, Buffer.from([0xff, 0xd8, 0xff])]);
+  assert.equal(parseBinaryPreview(jpegFrame), `data:image/jpeg;base64,${Buffer.from([0xff, 0xd8, 0xff]).toString('base64')}`);
+
+  const headerPng = Buffer.alloc(8);
+  headerPng.writeUInt32BE(1, 0);
+  headerPng.writeUInt32BE(2, 4);
+  const pngFrame = Buffer.concat([headerPng, Buffer.from([0x89, 0x50, 0x4e, 0x47])]);
+  assert.equal(parseBinaryPreview(pngFrame.buffer.slice(pngFrame.byteOffset, pngFrame.byteOffset + pngFrame.byteLength)), `data:image/png;base64,${Buffer.from([0x89, 0x50, 0x4e, 0x47]).toString('base64')}`);
+
+  const wrongType = Buffer.alloc(12);
+  wrongType.writeUInt32BE(2, 0);
+  wrongType.writeUInt32BE(1, 4);
+  assert.equal(parseBinaryPreview(wrongType), null);
+  assert.equal(parseBinaryPreview(Buffer.alloc(4)), null);
+
+  FakeWebSocket.instances = [];
+  const tracker = createProgressTracker({ WebSocketImpl: FakeWebSocket, reconnectMs: 5 });
+  tracker.ensure('http://127.0.0.1:8188');
+  const socket = FakeWebSocket.instances[0];
+  socket.emit('open');
+  socket.emit('message', { data: JSON.stringify({ type: 'execution_start', data: { prompt_id: 'p10' } }) });
+  socket.emit('message', { data: jpegFrame });
+  assert.match(tracker.snapshot('http://127.0.0.1:8188').previewDataUrl, /^data:image\/jpeg;base64,/);
+  socket.emit('message', { data: JSON.stringify({ type: 'execution_success', data: { prompt_id: 'p10' } }) });
+  assert.equal(tracker.snapshot('http://127.0.0.1:8188').previewDataUrl, null);
+  tracker.close();
 });

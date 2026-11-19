@@ -317,3 +317,75 @@ test('seed_widgets controls do not shift following widget values', () => {
   assert.equal(conversion.prompt['5'].inputs.scheduler, 'simple');
   assert.equal(conversion.prompt['5'].inputs.denoise, 1);
 });
+
+test('extractParams and applyOverrides support split samplers, Flux/SD3/GGUF, LoadImage, denoise and checkpoint', () => {
+  const workflow = {
+    id: 'flux-split',
+    revision: 1,
+    nodes: [
+      { id: 1, type: 'UnetLoaderGGUF', mode: 0, inputs: [], outputs: [{ name: 'MODEL', type: 'MODEL', links: [1] }], widgets_values: ['flux1-dev-Q4.gguf'] },
+      { id: 2, type: 'CLIPTextEncodeFlux', mode: 0, inputs: [], outputs: [{ name: 'CONDITIONING', type: 'CONDITIONING', links: [2] }], widgets_values: ['a cat', 'a cute cat in sunlight', 3.5] },
+      { id: 3, type: 'BasicGuider', mode: 0, inputs: [{ name: 'model', type: 'MODEL', link: 1 }, { name: 'conditioning', type: 'CONDITIONING', link: 2 }], outputs: [{ name: 'GUIDER', type: 'GUIDER', links: [3] }], widgets_values: [] },
+      { id: 4, type: 'RandomNoise', mode: 0, inputs: [], outputs: [{ name: 'NOISE', type: 'NOISE', links: [4] }], widgets_values: [777, 'randomize'] },
+      { id: 5, type: 'BasicScheduler', mode: 0, inputs: [{ name: 'model', type: 'MODEL', link: 1 }], outputs: [{ name: 'SIGMAS', type: 'SIGMAS', links: [5] }], widgets_values: ['simple', 20, 1.0] },
+      { id: 6, type: 'KSamplerSelect', mode: 0, inputs: [], outputs: [{ name: 'SAMPLER', type: 'SAMPLER', links: [6] }], widgets_values: ['euler'] },
+      { id: 7, type: 'EmptySD3LatentImage', mode: 0, inputs: [], outputs: [{ name: 'LATENT', type: 'LATENT', links: [7] }], widgets_values: [1024, 1024, 1] },
+      { id: 8, type: 'SamplerCustomAdvanced', mode: 0, inputs: [{ name: 'noise', type: 'NOISE', link: 4 }, { name: 'guider', type: 'GUIDER', link: 3 }, { name: 'sampler', type: 'SAMPLER', link: 6 }, { name: 'sigmas', type: 'SIGMAS', link: 5 }, { name: 'latent_image', type: 'LATENT', link: 7 }], outputs: [{ name: 'output', type: 'LATENT', links: [8] }], widgets_values: [] },
+      { id: 9, type: 'LoadImage', mode: 0, inputs: [], outputs: [{ name: 'IMAGE', type: 'IMAGE', links: [] }], widgets_values: ['ref.png', 'image'] },
+      { id: 10, type: 'SaveImage', mode: 0, inputs: [{ name: 'images', type: 'IMAGE', link: 8 }], outputs: [], widgets_values: ['flux'] },
+    ],
+    links: [
+      [1, 1, 0, 3, 0, 'MODEL'],
+      [2, 2, 0, 3, 1, 'CONDITIONING'],
+      [3, 3, 0, 8, 1, 'GUIDER'],
+      [4, 4, 0, 8, 0, 'NOISE'],
+      [5, 5, 0, 8, 3, 'SIGMAS'],
+      [6, 6, 0, 8, 2, 'SAMPLER'],
+      [7, 7, 0, 8, 5, 'LATENT'],
+      [8, 8, 0, 10, 0, 'IMAGE'],
+    ],
+  };
+  const objectInfo = docs();
+  objectInfo.set('UnetLoaderGGUF', { input: { required: { unet_name: [['flux1-dev-Q4.gguf', 'flux1-schnell-Q4.gguf'], {}] } }, output: ['MODEL'] });
+  objectInfo.set('CLIPTextEncodeFlux', { input: { required: { clip_l: ['STRING', {}], t5xxl: ['STRING', {}], guidance: ['FLOAT', {}] } }, output: ['CONDITIONING'] });
+  objectInfo.set('BasicGuider', { input: { required: { model: ['MODEL', {}], conditioning: ['CONDITIONING', {}] } }, output: ['GUIDER'] });
+  objectInfo.set('RandomNoise', { input: { required: { noise_seed: ['INT', { control_after_generate: true }] } }, output: ['NOISE'] });
+  objectInfo.set('BasicScheduler', { input: { required: { model: ['MODEL', {}], scheduler: [['simple', 'normal'], {}], steps: ['INT', {}], denoise: ['FLOAT', {}] } }, output: ['SIGMAS'] });
+  objectInfo.set('KSamplerSelect', { input: { required: { sampler_name: [['euler', 'dpmpp_2m'], {}] } }, output: ['SAMPLER'] });
+  objectInfo.set('EmptySD3LatentImage', { input: { required: { width: ['INT', {}], height: ['INT', {}], batch_size: ['INT', {}] } }, output: ['LATENT'] });
+  objectInfo.set('SamplerCustomAdvanced', { input: { required: { noise: ['NOISE', {}], guider: ['GUIDER', {}], sampler: ['SAMPLER', {}], sigmas: ['SIGMAS', {}], latent_image: ['LATENT', {}] } }, output: ['LATENT'] });
+  objectInfo.set('LoadImage', { input: { required: { image: [['ref.png'], {}] } }, output: ['IMAGE'] });
+
+  const conversion = convertWorkflow(workflow, objectInfo);
+  assert.equal(conversion.supported, true);
+  assert.equal(conversion.params.checkpoint, 'flux1-dev-Q4.gguf');
+  assert.equal(conversion.params.positive.text, 'a cute cat in sunlight');
+  assert.equal(conversion.params.sampler.seed, 777);
+  assert.equal(conversion.params.sampler.steps, 20);
+  assert.equal(conversion.params.sampler.denoise, 1);
+  assert.equal(conversion.params.latent.width, 1024);
+  assert.deepEqual(conversion.params.loadImages, [{ nodeId: '9', image: 'ref.png' }]);
+
+  const edited = applyOverrides(conversion, {
+    checkpoint: 'flux1-schnell-Q4.gguf',
+    positive: 'a dog in rain',
+    seed: 888,
+    steps: 8,
+    sampler: 'dpmpp_2m',
+    scheduler: 'normal',
+    denoise: 0.65,
+    width: 832,
+    height: 1216,
+    images: [{ nodeId: '9', image: 'uploaded.png' }],
+  });
+  assert.equal(edited.prompt['1'].inputs.unet_name, 'flux1-schnell-Q4.gguf');
+  assert.equal(edited.prompt['2'].inputs.t5xxl, 'a dog in rain');
+  assert.equal(edited.prompt['4'].inputs.noise_seed, 888);
+  assert.equal(edited.prompt['5'].inputs.steps, 8);
+  assert.equal(edited.prompt['5'].inputs.scheduler, 'normal');
+  assert.equal(edited.prompt['5'].inputs.denoise, 0.65);
+  assert.equal(edited.prompt['6'].inputs.sampler_name, 'dpmpp_2m');
+  assert.equal(edited.prompt['7'].inputs.width, 832);
+  assert.equal(edited.prompt['7'].inputs.height, 1216);
+  assert.equal(edited.prompt['9'].inputs.image, 'uploaded.png');
+});

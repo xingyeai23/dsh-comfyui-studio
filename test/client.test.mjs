@@ -514,3 +514,27 @@ test('unsupported workflows stay visible in the picker with their reasons', asyn
   assert.match(source, /workflowOptions\.map\(\(workflow\)/);
   assert.match(source, /workflow\.reasons\.join/);
 });
+
+test('new studio features: builtin workflow, autoRewrite, input images, presets, queue clear and reuse', async () => {
+  const { source, moduleExports } = await loadBundle();
+  assert.match(source, /BUILTIN_WORKFLOW_ID = '__builtin__'/);
+  assert.match(source, /ASPECT_PRESETS/);
+  assert.match(source, /toggleAutoRewrite/);
+  assert.match(source, /uploadInputFile/);
+  assert.match(source, /useResultAsInput/);
+  assert.match(source, /reuseMeta/);
+  assert.match(source, /clearQueueAction/);
+  assert.match(source, /WHATS_NEW_KEY/);
+  assert.match(source, /whatsNew\.title/);
+  assert.match(source, /cs-textarea--negative/);
+  assert.match(source, /liveProgress\?\.previewDataUrl/);
+  const { ctx, dictionaries } = fakeContext();
+  moduleExports.apply(ctx);
+  const zh = dictionaries[0].dicts.zh;
+  const en = dictionaries[0].dicts.en;
+  assert.deepEqual(Object.keys(zh).sort(), Object.keys(en).sort());
+  for (const key of ['actions.clearQueue', 'actions.useAsInput', 'workflow.builtin', 'field.denoise', 'section.inputImages', 'preview.live', 'lightbox.reuse']) {
+    assert.ok(Object.hasOwn(zh, key), `missing zh key ${key}`);
+    assert.ok(Object.hasOwn(en, key), `missing en key ${key}`);
+  }
+});
